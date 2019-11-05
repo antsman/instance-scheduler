@@ -65,12 +65,10 @@ def create_schedule_tag(instance):
             instance.create_tags(Tags=tags)
         except Exception as e:
             logger.error("Error adding Tag to EC2 instance: %s" % e)
-    else:
-        if autoscaling and debug:
-            logger.info("Ignoring EC2 instance %s, part of an auto scaling group." % instance.id)
-        else:
-            if instance.id in exclude_list:
-                logger.info("Ignoring EC2 instance %s (%s), in exclude_list." % (instance.id, instance_name))
+    elif autoscaling and debug:
+        logger.info("Ignoring EC2 instance %s, part of an auto scaling group." % instance.id)
+    elif instance.id in exclude_list:
+        logger.info("Ignoring EC2 instance %s (%s), in exclude_list." % (instance.id, instance_name))
 
 #
 # Loop EC2 instances and check if a 'schedule' tag has been set. Next, evaluate value and start/stop instance if needed.
@@ -137,9 +135,10 @@ def ec2_check():
                     start_match = False
                     if day+'_start' in schedule and hh == schedule[day+'_start']:
                         start_match = True
-                    else:
-                        if 'any_start' in schedule and hh == schedule['any_start']:
-                            start_match = True
+                    elif 'any_start' in schedule and hh == schedule['any_start']:
+                        start_match = True
+                    elif 'work_start' in schedule and day in 'mon tue wed thu fri'.split(' ') and hh == schedule['work_start']:
+                        start_match = True
 
                     if start_match:
                         logger.info("-----> Start time %s matches .." % hh)
@@ -153,9 +152,10 @@ def ec2_check():
                     stop_match = False
                     if day+'_stop' in schedule and hh == schedule[day+'_stop']:
                         stop_match = True
-                    else:
-                        if 'any_stop' in schedule and hh == schedule['any_stop']:
-                            stop_match = True
+                    elif 'any_stop' in schedule and hh == schedule['any_stop']:
+                        stop_match = True
+                    elif 'work_stop' in schedule and day in 'mon tue wed thu fri'.split(' ') and hh == schedule['work_stop']:
+                        stop_match = True
 
                     if stop_match:
                         logger.info("-----> Stop time %s matches .." % hh)
@@ -198,9 +198,8 @@ def rds_create_schedule_tag(instance):
             rds.add_tags_to_resource(ResourceName=instance['DBInstanceArn'],Tags=tags)
         except Exception as e:
             logger.error("Error adding Tag to RDS instance: %s" % e)
-    else:
-        if instance['DBInstanceIdentifier'] in exclude_list:
-            logger.info("Ignoring RDS instance %s, in exclude_list." % instance['DBInstanceIdentifier'])
+    elif instance['DBInstanceIdentifier'] in exclude_list:
+        logger.info("Ignoring RDS instance %s, in exclude_list." % instance['DBInstanceIdentifier'])
 
 #
 # Loop RDS instances and check if a 'Schedule' tag has been set. Next, evaluate value and start/stop instance if needed.
@@ -255,9 +254,10 @@ def rds_check():
                 start_match = False
                 if day+'_start' in schedule and hh == schedule[day+'_start']:
                     start_match = True
-                else:
-                    if 'any_start' in schedule and hh == schedule['any_start']:
-                        start_match = True
+                elif 'any_start' in schedule and hh == schedule['any_start']:
+                    start_match = True
+                elif 'work_start' in schedule and day in 'mon tue wed thu fri'.split(' ') and hh == schedule['work_start']:
+                    start_match = True
 
                 if start_match:
                     logger.info("-----> Start time %s matches .." % hh)
@@ -271,9 +271,10 @@ def rds_check():
                 stop_match = False
                 if day+'_stop' in schedule and hh == schedule[day+'_stop']:
                     stop_match = True
-                else:
-                    if 'any_stop' in schedule and hh == schedule['any_stop']:
-                        stop_match = True
+                elif 'any_stop' in schedule and hh == schedule['any_stop']:
+                    stop_match = True
+                elif 'work_stop' in schedule and day in 'mon tue wed thu fri'.split(' ') and hh == schedule['work_stop']:
+                    stop_match = True
 
                 if stop_match:
                     logger.info("-----> Stop time %s matches .." % hh)

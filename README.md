@@ -7,11 +7,14 @@ Based on [terraform-aws-lambda-scheduler](https://github.com/neillturner/terrafo
 The scheduler looks at the schedule tag to see if it needs to stop or start and instance.<br>
 It works by setting a tag (default name Schedule) to a string giving the stop and start time hour for each day.
 
-A schedule tag for an EC2 and a RDS instance is a string of keyword parameters separated by a space. Following is also valid using 'any' day:
+A schedule tag for an EC2 and a RDS instance is a string of keyword parameters separated by a space. Following is also valid using 'any' day
 ```
 any_stop=20 mon_start=7 tue_start=7 wed_start=7 thu_start=7 fri_start=7
 ```
-
+or 'work' day:
+```
+any_stop=20 work_start=7
+```
 It ignores instances that are part of autoscaling groups assuming scheduling actions can be used to stop and start these instances.<br>
 The scheduler can be configured to add a default schedule tag to EC2 and RDS instances it finds without a schedule tag.
 
